@@ -1,4 +1,3 @@
-const { existParent } = require("../helpers/check-parent-exist");
 const { getChildrens } = require("../helpers/get-childrens");
 const { Data } = require("../models");
 const { Op } = require("sequelize");
@@ -7,8 +6,8 @@ const asyncHandler = require("express-async-handler");
 exports.postData = asyncHandler(async (req, res) => {
   const { name, parentId } = req.body;
   if (parentId) {
-    const parent = await existParent(parentId);
-    if (parent) {
+    const parent = await Data.findAll({ where: { id: parentId } });
+    if (parent[0]) {
       const data = await Data.create({
         name,
         parentId,

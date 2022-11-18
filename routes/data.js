@@ -5,6 +5,7 @@ const {
   getAllDatas,
   deleteById,
   getChildrens,
+  getParent,
 } = require("../controllers/data-controller");
 
 // All datas
@@ -19,15 +20,7 @@ router.delete("/datas/:id", deleteById);
 // Childrens of a parent
 router.get("/datas/childrens/:parentId", getChildrens);
 
-// find by contition
-router.get("/datasByContition", (req, res) => {
-  Data.findAll({ where: { id: req.body.id } })
-    .then((data) => {
-      res.json(data);
-    })
-    .catch((err) => {
-      err ? console.log(err) : null;
-    });
-});
+// Parent of a child
+router.get("/datas/parent/:childId", getParent);
 
 module.exports = router;

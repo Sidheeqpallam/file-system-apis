@@ -65,7 +65,7 @@ exports.getChildrens = asyncHandler(async (req, res) => {
 });
 
 exports.getParent = asyncHandler(async (req, res) => {
-  const childrenId = req.params.id;
+  const childrenId = req.params.childId;
   if (!childrenId) {
     return res.status(400).json({ message: "Childrens id is required." });
   }

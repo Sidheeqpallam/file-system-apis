@@ -1,6 +1,9 @@
-const { getChildrens } = require("../helpers/get-childrens");
-const { Data } = require("../models");
+const { Data } = require("../models/Data");
 const { Op } = require("sequelize");
+const {
+  getChildren,
+  getChildrenInHeirarchy,
+} = require("../helpers/get-children");
 const asyncHandler = require("express-async-handler");
 
 exports.postData = asyncHandler(async (req, res) => {
@@ -34,21 +37,21 @@ exports.deleteById = asyncHandler(async (req, res) => {
   if (!datas[0]) {
     return res.status(400).json({ message: "There is no data in this id." });
   }
-  const childrens = await Data.findAll({ where: { parentId: datas[0].id } });
-  if (!childrens[0]) {
+  const children = await Data.findAll({ where: { parentId: datas[0].id } });
+  if (!children[0]) {
     const deletedNo = await Data.destroy({ where: { id } });
     res.json({ message: `${deletedNo} data deleted.` });
   } else {
-    const childrensIds = await getChildrens(childrens);
-    childrens.push(id);
+    const childrenIds = await getChildren(children);
+    children.push(id);
     const deletedNo = await Data.destroy({
-      where: { id: { [Op.or]: childrensIds } },
+      where: { id: { [Op.or]: childrenIds } },
     });
     res.json({ message: `${deletedNo} datas deleted.` });
   }
 });
 
-exports.getChildrens = asyncHandler(async (req, res) => {
+exports.getChildren = asyncHandler(async (req, res) => {
   const parentId = req.params.parentId;
   if (!parentId) {
     return res.status(400).json({ message: "Parent id is required." });
@@ -57,17 +60,17 @@ exports.getChildrens = asyncHandler(async (req, res) => {
   if (!parent[0]) {
     return res.status(400).json({ message: "Parent is not found in this id." });
   }
-  const childrens = await Data.findAll({ where: { parentId } });
-  if (!childrens[0]) {
+  const children = await Data.findAll({ where: { parentId } });
+  if (!children[0]) {
     return res.json({ message: "Any children exist inside of this parent." });
   }
-  res.send(childrens);
+  res.send(children);
 });
 
 exports.getParent = asyncHandler(async (req, res) => {
   const childrenId = req.params.childId;
   if (!childrenId) {
-    return res.status(400).json({ message: "Childrens id is required." });
+    return res.status(400).json({ message: "children id is required." });
   }
   const children = await Data.findAll({ where: { id } });
   if (!children[0]) {
@@ -85,12 +88,8 @@ exports.getParent = asyncHandler(async (req, res) => {
   res.send(parent);
 });
 
-exports.getAllDatas = (req, res) => {
-  Data.findAll()
-    .then((datas) => {
-      res.json(datas);
-    })
-    .catch((err) => {
-      err ? console.log(err) : null;
-    });
-};
+exports.getAllData = asyncHandler(async (req, res) => {
+  const ancestors = await Data.findAll({ where: { parentId: null } });
+  const data = await getChildrenInHeirarchy(ancestors);
+  res.send(data);
+});

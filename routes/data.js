@@ -1,26 +1,25 @@
 const router = require("express").Router();
-const { Data } = require("../models");
 const {
   postData,
-  getAllDatas,
+  getAllData,
   deleteById,
-  getChildrens,
+  getChildren,
   getParent,
 } = require("../controllers/data-controller");
 
 // All datas
-router.get("/datas", getAllDatas);
+router.get("/data", getAllData);
 
 // Create data
-router.post("/datas", postData);
+router.post("/data", postData);
 
 // delete data
-router.delete("/datas/:id", deleteById);
+router.delete("/data/:id", deleteById);
 
 // Childrens of a parent
-router.get("/datas/childrens/:parentId", getChildrens);
+router.get("/data/children/:parentId", getChildren);
 
 // Parent of a child
-router.get("/datas/parent/:childId", getParent);
+router.get("/data/parent/:childId", getParent);
 
 module.exports = router;
